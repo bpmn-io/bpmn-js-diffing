@@ -156,4 +156,62 @@ describe('diffing', function() {
 
   });
 
+
+  describe('api', function() {
+
+    it('should diff with default handler', function(done) {
+
+      var aDiagram = fs.readFileSync('test/fixtures/layout-change/before.bpmn', 'utf-8');
+      var bDiagram = fs.readFileSync('test/fixtures/layout-change/after.bpmn', 'utf-8');
+
+      // when
+      importDiagrams(aDiagram, bDiagram, function(err, aDefinitions, bDefinitions) {
+
+        if (err) {
+          return done(err);
+        }
+
+        // when
+        var results = new Differ().diff(aDefinitions, bDefinitions);
+
+        // then
+        expect(results._added).to.eql({});
+        expect(results._removed).to.eql({});
+        expect(results._layoutChanged).to.have.keys([ 'Task_1', 'SequenceFlow_1' ]);
+        expect(results._changed).to.eql({});
+
+        done();
+      });
+
+    });
+
+
+    it('should diff via static diff', function(done) {
+
+      var aDiagram = fs.readFileSync('test/fixtures/layout-change/before.bpmn', 'utf-8');
+      var bDiagram = fs.readFileSync('test/fixtures/layout-change/after.bpmn', 'utf-8');
+
+      // when
+      importDiagrams(aDiagram, bDiagram, function(err, aDefinitions, bDefinitions) {
+
+        if (err) {
+          return done(err);
+        }
+
+        // when
+        var results = Differ.diff(aDefinitions, bDefinitions);
+
+        // then
+        expect(results._added).to.eql({});
+        expect(results._removed).to.eql({});
+        expect(results._layoutChanged).to.have.keys([ 'Task_1', 'SequenceFlow_1' ]);
+        expect(results._changed).to.eql({});
+
+        done();
+      });
+
+    });
+
+  });
+
 });

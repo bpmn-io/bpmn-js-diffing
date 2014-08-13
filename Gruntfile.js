@@ -14,6 +14,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     config: {
+      app: 'app',
       sources: 'lib',
       tests: 'test'
     },
@@ -28,10 +29,8 @@ module.exports = function(grunt) {
 
     jshint: {
       src: ['<%= config.sources %>'],
-
       options: {
-        jshintrc: true,
-        ignores: [ '<%= config.sources %>/util/EventEmitter.js' ]
+        jshintrc: true
       }
     },
 
@@ -48,13 +47,47 @@ module.exports = function(grunt) {
         browserify: {
           watch: false,
           debug: true,
-          transform: [ 'brfs' ]
+          transform: [ [ 'brfs', { global: true } ] ]
         }
       },
       unit: {
         browsers: TEST_BROWSERS,
         debug: true
       }
+    },
+
+    browserify: {
+      options: {
+        browserifyOptions: {
+          builtins: false
+        },
+        bundleOptions: {
+          detectGlobals: false,
+          insertGlobalVars: [],
+          debug: true
+        }
+      },
+      watch: {
+        files: {
+          '<%= config.app %>/bpmn-viewer.js': [ '<%= config.app %>/bpmn.js', 'index.js' ]
+        },
+        options: {
+          watch: true
+        }
+      },
+      standaloneViewer: {
+        files: {
+          '<%= config.app %>/bpmn-viewer.js': [ '<%= config.app %>/bpmn.js', 'index.js' ]
+        },
+        options: {
+          alias: [
+            'jquery:jquery',
+            'lodash:lodash',
+            'index.js:bpmn-js-diffing',
+            '<%= config.app %>/bpmn.js:bpmn-js'
+          ]
+        }
+      },
     },
 
     jsdoc: {
@@ -74,5 +107,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask('auto-test', [ 'karma:unit' ]);
 
-  grunt.registerTask('default', [ 'jshint', 'test', 'jsdoc' ]);
+  grunt.registerTask('default', [ 'jshint', 'test', 'browserify:standaloneViewer', 'jsdoc' ]);
 };
