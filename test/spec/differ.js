@@ -271,7 +271,7 @@ describe('diffing', function() {
         ]);
 
         expect(results._layoutChanged).to.have.keys([
-          '_6-61', '_6-640', '_6-648', '_6-638'
+          '_6-61'
         ]);
 
         expect(results._changed).to.have.keys([ '_6-127' ]);
