@@ -55,9 +55,34 @@
 			});			
 
 			$.each(data.edited, function(i, obj) {
-				
 			  viewerOld.get("elementRegistry").getGraphicsByElement(i).addClass("elementEdited");
+
+			  	var details = "<div id='" + i + "' class='changeDetails'>";
+			  	$.each(obj, function(attr, changes) {
+			  		details = details + "Attribute: " + attr + " | old: " + changes.old + " | new: " + changes.new + "<br/>";
+			  	});
+
+			  	details = details + "</div>";
+
+  			   viewerOld.get("elementRegistry").getGraphicsByElement(i).click (function (event) {
+			  	
+			  	alert (details);
+			  });
+
 			  viewerNew.get("elementRegistry").getGraphicsByElement(i).addClass("elementEdited");
+
+			  // add Popover for Change Details
+            var overlays = viewerOld.get('overlays');
+
+            // attach an overlay to a node
+            overlays.add(i, {
+              position: {
+                bottom: 0,
+                left: 0
+              },
+              html: details
+            });
+
 			});			
 
 
@@ -71,31 +96,41 @@
 	});
 
 
+	function openDiagram (xml, target) {
+		$( "#" + target ).empty();
+
+		var BpmnViewer = window.BpmnJS;
+		var viewer = new BpmnViewer({ container: '#' + target, height: '100%', width: '100%' });
+
+		viewer.importXML(xml, function(err) {
+		    if (!err) {
+		      console.log('success!');
+
+		    } else {
+		      console.log('something went wrong:', err);
+		    }
+		  });
+
+	}
+
+	$('.file').on('change', function(e) {
+		openFile(e.target.files[0], openDiagram, $(this).attr("target"));
+	});
 
 
-	  var fileInput = $('<input type="file" />').appendTo(document.body).css({
-	    width: 100,
-	    height: 50
-	  }).on('change', function(e) {
-	    track('diagram', 'open-dialog');
-	    openFile(e.target.files[0], openDiagram);
-	  });
-
-
-	function openFile(file, callback) {
-	    setStatus('loading');
-
+	function openFile(file, callback, target) {
 	    var reader = new FileReader();
-
 	    reader.onload = function(e) {
-
 	      var xml = e.target.result;
-
-	      callback(xml);
+	      callback(xml, target);
 	    };
 
 	    reader.readAsText(file);
 	  }
+
+
+
+
 
 	  function oldstuff() {
 

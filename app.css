@@ -31,3 +31,10 @@ html, body, .canvas {
 .elementEdited .djs-visual > *:nth-child(1) {
 	stroke: orange !important;
 }
+
+.changeDetails {
+	border: 3px solid pink;
+	font-size: 80%;
+	width:150px;
+	background-color: #fff;
+}
