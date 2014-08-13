@@ -7,6 +7,7 @@
       Diffing = require('bpmn-js-diffing');
 
 
+
   // we use $.ajax to load the diagram.
   // make sure you run the application via web-server (ie. connect (node) or asdf (ruby))
 
@@ -14,6 +15,7 @@
 
   var viewerNew = new BpmnViewer({ container: '#canvas_new', height: '100%', width: '100%' });
 
+  var loaded = 0;
 
   $.get('../resources/pizza-collaboration/old.bpmn', function(pizzaDiagram) {
     viewerOld.importXML(pizzaDiagram, function(err) {
@@ -21,6 +23,9 @@
       if (!err) {
         console.log('success!');
         //viewerOld.get('canvas').zoom('fit-viewport');
+        if (++loaded === 2) {
+          showDiff(viewerOld, viewerNew);
+        }
 
       } else {
         console.log('something went wrong:', err);
@@ -34,28 +39,39 @@
       if (!err) {
         console.log('success!');
         //viewerNew.get('canvas').zoom('fit-viewport');
+        if (++loaded === 2) {
+          showDiff(viewerOld, viewerNew);
+        }
+        
       } else {
         console.log('something went wrong:', err);
       }
 
-    $.getJSON( 'diff.json', function( data ) {
-      console.log(data);
+    // viewerOld.get('elementRegistry').getGraphicsByElement('_6-74').addClass('elementRemoved');
+    });
+  });
 
 
-      $.each(data.removed, function(i, obj) {
+  function showDiff(viewerOld, viewerNew) {
+
+    var result = Diffing.diff (viewerOld.definitions, viewerNew.definitions);      
+
+    console.log (result);
+
+      $.each(result._removed, function(i, obj) {
         viewerOld.get('elementRegistry').getGraphicsByElement(obj).addClass('elementRemoved');
       });
 
-      $.each(data.added, function(i, obj) {
+      $.each(result._added, function(i, obj) {
         viewerNew.get('elementRegistry').getGraphicsByElement(obj).addClass('elementAdded');
       });
 
-      $.each(data.moved, function(i, obj) {
+      $.each(result._layoutChanged, function(i, obj) {
         viewerOld.get('elementRegistry').getGraphicsByElement(obj).addClass('elementMoved');
         viewerNew.get('elementRegistry').getGraphicsByElement(obj).addClass('elementMoved');
       });
 
-      $.each(data.edited, function(i, obj) {
+      $.each(result._changed, function(i, obj) {
         viewerOld.get('elementRegistry').getGraphicsByElement(i).addClass('elementEdited');
 
           var details = '<div id="' + i + '" class="changeDetails">';
@@ -87,15 +103,8 @@
       });
 
 
-    });
-
-    // viewerOld.get('elementRegistry').getGraphicsByElement('_6-74').addClass('elementRemoved');
-
-
-
-    });
-  });
-
+    
+  }
 
   function openDiagram (xml, target) {
     $( '#' + target ).empty();
