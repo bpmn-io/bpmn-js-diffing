@@ -50,6 +50,34 @@
   }
 
 
+  function syncNavigation(viewerOld, viewerNew) {
+
+    var changing;
+
+    function update(viewer) {
+
+      return function(e) {
+        if (changing) {
+          return;
+        }
+
+        changing = true;
+        viewer.get('canvas').viewbox(e.viewbox);
+        changing = false;
+      };
+    }
+
+    function syncViewbox(a, b) {
+      a.get('eventBus').on('canvas.viewbox.changed', update(b));
+    }
+
+
+    syncViewbox(viewerOld, viewerNew);
+    syncViewbox(viewerNew, viewerOld);
+
+  }
+
+
   function showDiff(viewerOld, viewerNew) {
 
     var result = Diffing.diff (viewerOld.definitions, viewerNew.definitions);
@@ -157,6 +185,9 @@
     if (err) {
       return console.log('something went wrong when opening the diagrams', err);
     }
+
+    // sync viewer navigation
+    syncNavigation(viewerOld, viewerNew);
 
     // show diff
     showDiff(viewerOld, viewerNew);
