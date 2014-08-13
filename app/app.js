@@ -87,6 +87,8 @@
           addMarker (overlays, i, "marker-changed", "&#9998;");
 
           viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('elementEdited');
+          var overlays = viewerNew.get('overlays');
+          addMarker (overlays, i, "marker-changed", "&#9998;");
       
           var details = '<div class="changeDetails"><table id="' + i + '" ><tr><th>Attribute</th><th>old</th><th>new</th></tr>';
           $.each(obj.attrs, function(attr, changes) {
