@@ -3,6 +3,7 @@ html, body, .canvas {
 }
 
 .canvasContainer {
+	vertical-align: top;
 	width:40%;
 	display:inline-block;
 
@@ -18,7 +19,29 @@ html, body, .canvas {
 
 .changeDetails {
 	border: 3px solid pink;
-	font-size: 80%;
-	width:150px;
+	
+	width: 300px;
 	background-color: #fff;
+}
+
+.marker {
+	border-radius: 50%;
+	background-color: grey;
+	color:white;
+	font-weight: bold;
+	font-size: 200%;
+	padding-right:10px;
+	padding-left:10px;
+}
+
+.marker-added {
+	background-color: green;
+}
+
+.marker-removed {
+	background-color: red;
+}
+
+.marker-changed {
+	background-color: orange;
 }
