@@ -76,7 +76,13 @@
       $.each(result._layoutChanged, function(i, obj) {
         console.log (i);
         viewerOld.get('elementRegistry').getGraphicsByElement(i).addClass('elementMoved');
+        var overlays = viewerOld.get('overlays');
+        addMarker (overlays, i, "marker-layoutChanged", "&#8680;");
+
         viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('elementMoved');
+        var overlays = viewerNew.get('overlays');
+        addMarker (overlays, i, "marker-layoutChanged", "&#8680;");
+
       });
 
 
