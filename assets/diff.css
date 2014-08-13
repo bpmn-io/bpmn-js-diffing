@@ -1,0 +1,15 @@
+.elementRemoved .djs-visual > *:nth-child(1) {
+  stroke: red !important;
+}
+
+.elementAdded .djs-visual > *:nth-child(1) {
+  stroke: green !important;
+}
+
+.elementMoved .djs-visual > *:nth-child(1) {
+  stroke: blue !important;
+}
+
+.elementEdited .djs-visual > *:nth-child(1) {
+  stroke: orange !important;
+}

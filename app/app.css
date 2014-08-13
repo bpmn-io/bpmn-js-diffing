@@ -1,0 +1,24 @@
+html, body, .canvas {
+	height: 100%
+}
+
+.canvasContainer {
+	width:40%;
+	display:inline-block;
+
+}
+
+#canvas_old {
+	padding-right: 20px;
+}
+
+#canvas_new {
+	margin-left: 20px;
+}
+
+.changeDetails {
+	border: 3px solid pink;
+	font-size: 80%;
+	width:150px;
+	background-color: #fff;
+}
