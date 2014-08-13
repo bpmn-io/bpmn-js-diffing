@@ -41,19 +41,19 @@
         if (++loaded === 2) {
           showDiff(viewerOld, viewerNew);
         }
-        
+
       } else {
         console.log('something went wrong:', err);
       }
 
-    
+
     });
   });
 
 
   function showDiff(viewerOld, viewerNew) {
 
-    var result = Diffing.diff (viewerOld.definitions, viewerNew.definitions);      
+    var result = Diffing.diff (viewerOld.definitions, viewerNew.definitions);
 
     console.log (result);
 
@@ -70,7 +70,7 @@
 
         var overlays = viewerNew.get('overlays');
         addMarker (overlays, i, "marker-added", "&#43;");
-       
+
       });
 
       $.each(result._layoutChanged, function(i, obj) {
@@ -89,7 +89,7 @@
           viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('elementEdited');
           var overlays = viewerNew.get('overlays');
           addMarker (overlays, i, "marker-changed", "&#9998;");
-      
+
           var details = '<div class="changeDetails"><table id="' + i + '" ><tr><th>Attribute</th><th>old</th><th>new</th></tr>';
           $.each(obj.attrs, function(attr, changes) {
             details = details + '<tr><td>' + attr + '</td><td>' + changes.oldValue + '</td><td>' + changes.newValue + '</td></tr>';
@@ -115,11 +115,11 @@
               html: details
             });
 
-  
+
       });
 
 
-    
+
   }
 
   function openDiagram (xml, target) {
@@ -146,7 +146,7 @@
           } else {
             console.log('something went wrong:', err);
           }
-        });      
+        });
     }
 
   }
@@ -172,15 +172,19 @@
 
 
   function addMarker (overlays, elementId, className, symbol) {
-        
-        // attach an overlay to a node
-        overlays.add(elementId, {
-          position: {
-            top: -15,
-            right: 20
-          },
-          html: "<span class='marker " + className + "'>" + symbol + "</span>"
-        });
+
+    try {
+      // attach an overlay to a node
+      overlays.add(elementId, {
+        position: {
+          top: -15,
+          right: 20
+        },
+        html: "<span class='marker " + className + "'>" + symbol + "</span>"
+      });
+    } catch (e) {
+      // fuck you, haha
+    }
 
   }
 
