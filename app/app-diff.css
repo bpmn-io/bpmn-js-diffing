@@ -9,6 +9,10 @@ html, body, .canvas {
 
 }
 
+.djs-container {
+	overflow: hidden;
+}
+
 #canvas_old {
 	padding-right: 20px;
 }
