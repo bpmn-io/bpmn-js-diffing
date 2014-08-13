@@ -125,6 +125,12 @@ describe('diffing', function() {
         expect(results._layoutChanged).to.eql({});
         expect(results._changed).to.have.keys([ 'Task_1'  ]);
 
+        console.log(results._changed['Task_1'].attrs.name.oldValue);
+
+        expect(results._changed['Task_1'].attrs).to.deep.eql({
+          name: { oldValue: undefined, newValue: 'TASK'}
+        });
+
         done();
       });
 
