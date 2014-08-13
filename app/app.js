@@ -96,30 +96,48 @@
           var overlays = viewerNew.get('overlays');
           addMarker (overlays, i, "marker-changed", "&#9998;");
 
-          var details = '<div class="changeDetails"><table id="' + i + '" ><tr><th>Attribute</th><th>old</th><th>new</th></tr>';
+          var details = '<table ><tr><th>Attribute</th><th>old</th><th>new</th></tr>';
           $.each(obj.attrs, function(attr, changes) {
             details = details + '<tr><td>' + attr + '</td><td>' + changes.oldValue + '</td><td>' + changes.newValue + '</td></tr>';
           });
 
           details = details + '</table></div>';
 
-           viewerOld.get('elementRegistry').getGraphicsByElement(i).click (function (event) {
+          viewerOld.get('elementRegistry').getGraphicsByElement(i).click (function (event) {
+             $('#changeDetailsOld_' + i).toggle();
+          });
 
-           alert(details);
-        });
+          var detailsOld = '<div id="changeDetailsOld_' + i + '" class="changeDetails">' + details;
 
-        viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('elementEdited');
-
-            var overlays = viewerOld.get('overlays');
-
+          var overlays = viewerOld.get('overlays');
             // attach an overlay to a node
             overlays.add(i, {
               position: {
-                bottom: 0,
+                bottom: -5,
                 left: 0
               },
-              html: details
+              html: detailsOld
             });
+            $('#changeDetailsOld_' + i).toggle();
+
+          viewerNew.get('elementRegistry').getGraphicsByElement(i).click (function (event) {
+             $('#changeDetailsNew_' + i).toggle();
+          });
+
+          viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('elementEdited');
+
+          var detailsNew = '<div id="changeDetailsNew_' + i + '" class="changeDetails">' + details;
+
+          var overlays = viewerNew.get('overlays');
+            // attach an overlay to a node
+            overlays.add(i, {
+              position: {
+                bottom: -5,
+                left: 0
+              },
+              html: detailsNew
+            });
+            $('#changeDetailsNew_' + i).toggle();
 
 
       });

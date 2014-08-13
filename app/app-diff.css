@@ -1,0 +1,65 @@
+html, body, .canvas {
+	height: 100%
+}
+
+.canvasContainer {
+	vertical-align: top;
+	width:40%;
+	display:inline-block;
+
+}
+
+#canvas_old {
+	padding-right: 20px;
+}
+
+#canvas_new {
+	margin-left: 20px;
+}
+
+.changeDetails table {
+	border: 2px solid orange;
+	width: 300px;
+	background-color: #fff;
+}
+
+.changeDetails th {
+	text-align: left;
+}
+
+
+.marker {
+	border-radius: 50%;
+	background-color: grey;
+	color:white;
+	font-weight: bold;
+	font-size: 150%;
+	padding-right:6px;
+	padding-left:6px;
+}
+
+.marker-added {
+	background-color: green;
+}
+
+.marker-removed {
+	background-color: red;
+}
+
+.marker-changed {
+	background-color: orange;
+	font-size: 130%;
+	padding-top:2px;
+	padding-bottom: 2px;
+	padding-left:5px;
+	padding-right: 5px;
+}
+
+.marker-layoutChanged {
+	background-color: blue;
+	font-size: 120%;
+	padding-top:2px;
+	padding-bottom: 2px;
+	padding-left:4px;
+	padding-right: 4px;
+}
