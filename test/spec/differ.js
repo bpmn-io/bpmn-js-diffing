@@ -17,44 +17,45 @@ var Differ = require('../../lib/differ'),
 TestHelper.insertCSS('diff.css', fs.readFileSync('assets/diff.css', 'utf-8'));
 
 
+function importDiagrams(a, b, done) {
+
+  new BpmnModdle().fromXML(a, function(err, adefs) {
+
+    if (err) {
+      return done(err);
+    }
+
+    new BpmnModdle().fromXML(b, function(err, bdefs) {
+      if (err) {
+        return done(err);
+      } else {
+        return done(null, adefs, bdefs);
+      }
+    });
+  });
+}
+
+
+function diff(a, b, done) {
+
+  importDiagrams(a, b, function(err, adefs, bdefs) {
+    if (err) {
+      return done(err);
+    }
+
+    // given
+    var handler = new SimpleChangeHandler();
+
+    // when
+    new Differ().diff(adefs, bdefs, handler);
+
+    done(err, handler, adefs, bdefs);
+  });
+
+}
+
+
 describe('diffing', function() {
-
-  function importDiagrams(a, b, done) {
-
-    new BpmnModdle().fromXML(a, function(err, adefs) {
-
-      if (err) {
-        return done(err);
-      }
-
-      new BpmnModdle().fromXML(b, function(err, bdefs) {
-        if (err) {
-          return done(err);
-        } else {
-          return done(null, adefs, bdefs);
-        }
-      });
-    });
-  }
-
-  function diff(a, b, done) {
-
-    importDiagrams(a, b, function(err, adefs, bdefs) {
-      if (err) {
-        return done(err);
-      }
-
-      // given
-      var handler = new SimpleChangeHandler();
-
-      // when
-      new Differ().diff(adefs, bdefs, handler);
-
-      done(err, handler, adefs, bdefs);
-    });
-
-  }
-
 
   describe('diff', function() {
 
@@ -124,8 +125,6 @@ describe('diffing', function() {
         expect(results._removed).to.eql({});
         expect(results._layoutChanged).to.eql({});
         expect(results._changed).to.have.keys([ 'Task_1'  ]);
-
-        console.log(results._changed['Task_1'].attrs.name.oldValue);
 
         expect(results._changed['Task_1'].attrs).to.deep.eql({
           name: { oldValue: undefined, newValue: 'TASK'}
@@ -220,4 +219,66 @@ describe('diffing', function() {
 
   });
 
+
+  describe('scenarios', function() {
+
+
+    it('should diff pizza collaboration StartEvent move', function(done) {
+
+      var aDiagram = fs.readFileSync('resources/pizza-collaboration/start-event-old.bpmn', 'utf-8');
+      var bDiagram = fs.readFileSync('resources/pizza-collaboration/start-event-new.bpmn', 'utf-8');
+
+
+      // when
+      diff(aDiagram, bDiagram, function(err, results, aDefinitions, bDefinitions) {
+
+        if (err) {
+          return done(err);
+        }
+
+        // then
+        expect(results._added).to.eql({});
+        expect(results._removed).to.eql({});
+        expect(results._layoutChanged).to.have.keys([ '_6-61' ]);
+        expect(results._changed).to.eql({});
+
+        done();
+      });
+    });
+
+
+    it('should diff pizza collaboration', function(done) {
+
+      var aDiagram = fs.readFileSync('resources/pizza-collaboration/old.bpmn', 'utf-8');
+      var bDiagram = fs.readFileSync('resources/pizza-collaboration/new.bpmn', 'utf-8');
+
+
+      // when
+      diff(aDiagram, bDiagram, function(err, results, aDefinitions, bDefinitions) {
+
+        if (err) {
+          return done(err);
+        }
+
+        // then
+        expect(results._added).to.have.keys([
+          'ManualTask_1',
+          'ExclusiveGateway_1'
+        ]);
+
+        expect(results._removed).to.have.keys([
+          '_6-674', '_6-691', '_6-746', '_6-748', '_6-74', '_6-125', '_6-178', '_6-642'
+        ]);
+
+        expect(results._layoutChanged).to.have.keys([
+          '_6-61', '_6-640', '_6-648', '_6-638'
+        ]);
+
+        expect(results._changed).to.have.keys([ '_6-127' ]);
+
+        done();
+      });
+    });
+
+  });
 });
