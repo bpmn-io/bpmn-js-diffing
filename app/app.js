@@ -349,18 +349,43 @@
 
     $("#changesOverviewTable tr").click(function() {
 
+      var containerWidth = $('.di-container').width();
+      var containerHeight = $('.di-container').height();
+
       var elementId =  $(this).attr("elementId");
       var changed = $(this).attr("changed");
 
       if (changed == "removed") {
-        var x = viewerOld.get('elementRegistry').getById(elementId).x;
-        var y = viewerOld.get('elementRegistry').getById(elementId).y;
 
-        
+        if (viewerOld.get('elementRegistry').getById(elementId).waypoints) {
+          var x = viewerOld.get('elementRegistry').getById(elementId).waypoints[0].x;
+          var y = viewerOld.get('elementRegistry').getById(elementId).waypoints[0].y;
+
+        } else {
+          var x = viewerOld.get('elementRegistry').getById(elementId).x;
+          var y = viewerOld.get('elementRegistry').getById(elementId).y;
+        }
+
+        var newCanvas = viewerOld.get('canvas');
+        newCanvas.viewbox({ x: x - (containerWidth/2), y: y - (containerHeight/2), width: containerWidth, height: 800 });
+      
+      } else {
+
+        if (viewerNew.get('elementRegistry').getById(elementId).waypoints) {
+          var x = viewerNew.get('elementRegistry').getById(elementId).waypoints[0].x;
+          var y = viewerNew.get('elementRegistry').getById(elementId).waypoints[0].y;
+
+        } else {
+
+          var x = viewerNew.get('elementRegistry').getById(elementId).x;
+          var y = viewerNew.get('elementRegistry').getById(elementId).y;
+        }
+
+        var newCanvas = viewerNew.get('canvas');
+        newCanvas.viewbox({ x: x - (containerWidth/2), y: y - (containerHeight/2), width: containerWidth, height: 800 });
       }
 
-      var newCanvas = viewerNew.get('canvas');
-      newCanvas.viewbox({ x: 200, y: 0, width: 800, height: 800 });
+
 
 
     });
