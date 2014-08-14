@@ -296,10 +296,23 @@
     }
   }
 
-  $('#changesOverviewToggle').on('click', function(e) {
-    showChangesOverview();
 
+  $("#changesOverviewContainer").hide();
+  $('#hideChangesOverview').hide();
+
+  $('#hideChangesOverview').click(function () {
+    $('#hideChangesOverview').hide();
+    $('#showChangesOverview').show();
+    $("#changesOverviewContainer").slideToggle("fast");
   });
+
+  $('#showChangesOverview').click(function () {
+    $('#showChangesOverview').hide();
+    $("#changesOverviewContainer").slideToggle("fast", function() {
+        $('#hideChangesOverview').show();
+    });
+  });  
+
   
   function showChangesOverview (result, viewerOld, viewerNew) {
     

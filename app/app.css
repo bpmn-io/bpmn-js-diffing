@@ -104,9 +104,36 @@
   text-align: center;
   overflow: auto;
   color: #fff;
-
   z-index: 110;
 }
+
+#hideChangesOverview {
+  position: absolute;
+  left: 25%;
+  bottom: 40%;
+  width: 50%;
+  height: 50px;
+  background: rgba(20, 20, 20, .8);
+  text-align: center;
+  color: #fff;
+  z-index: 110;
+  cursor: pointer;
+}
+
+#showChangesOverview {
+  position: absolute;
+  left: 25%;
+  bottom: 0;
+  width: 50%;
+  height: 50px;
+  background: rgba(20, 20, 20, .8);
+  text-align: center;
+  color: #fff;
+  z-index: 110;
+  cursor: pointer;
+  
+}
+
 
 #changesOverviewTable {
   margin: 30px;
