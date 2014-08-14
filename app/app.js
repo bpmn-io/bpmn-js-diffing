@@ -302,6 +302,9 @@
   });
   
   function showChangesOverview (result, viewerOld, viewerNew) {
+    
+    $("#changesOverviewTable").remove();
+
     var changesOverviewTable = "<table id='changesOverviewTable'><tr><th>#</th><th>Name</th><th>Type</th><th>Change</th></tr>";
 
     console.log (result);
