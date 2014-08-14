@@ -114,7 +114,7 @@
   text-align: left;
 }
 
-#changesOverviewTable tr:hover {
+.changesOverviewTr:hover {
   background-color: #000;
   cursor: pointer;
 }

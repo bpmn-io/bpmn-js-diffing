@@ -294,22 +294,22 @@
 
     $.each(result._removed, function(i, obj) {
       count++;
-      changesOverviewTable += "<tr elementId='" + obj.id + "' changed='removed'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='removed'>Removed</td></tr>";
+      changesOverviewTable += "<tr class='changesOverviewTr' elementId='" + obj.id + "' changed='removed'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='removed'>Removed</td></tr>";
     });
 
     $.each(result._added, function(i, obj) {
       count++;
-      changesOverviewTable += "<tr elementId='" + obj.id + "' changed='added'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='added'>Added</td></tr>";
+      changesOverviewTable += "<tr class='changesOverviewTr' elementId='" + obj.id + "' changed='added'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='added'>Added</td></tr>";
     });
 
     $.each(result._changed, function(i, obj) {
       count++;
-      changesOverviewTable += "<tr elementId='" + obj.model.id + "' changed='changed'><td>" + count + "</td><td>" + obj.model.name + "</td><td>" + obj.model.$type.replace('bpmn:', '') + "</td><td class='changed'>Changed</td></tr>";
+      changesOverviewTable += "<tr class='changesOverviewTr' elementId='" + obj.model.id + "' changed='changed'><td>" + count + "</td><td>" + obj.model.name + "</td><td>" + obj.model.$type.replace('bpmn:', '') + "</td><td class='changed'>Changed</td></tr>";
     });
 
     $.each(result._layoutChanged, function(i, obj) {
       count++;
-      changesOverviewTable += "<tr elementId='" + obj.id + "' changed='layoutChanged'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='layoutChanged'>Layout</td></tr>";
+      changesOverviewTable += "<tr class='changesOverviewTr' elementId='" + obj.id + "' changed='layoutChanged'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='layoutChanged'>Layout</td></tr>";
     });
 
     changesOverviewTable += "</table>";
@@ -318,10 +318,12 @@
   
     $('#changesOverviewContainer').append (changesOverviewTable);
 
-    $("#changesOverviewTable tr").hover(
+    $(".changesOverviewTr").hover(
       function() {
         var elementId =  $(this).attr("elementId");
         var changed = $(this).attr("changed");
+
+        console.log ("Element ID ist: " + elementId);
 
         if (changed == "removed") {
           viewerOld.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
@@ -347,7 +349,7 @@
       }
     );
 
-    $("#changesOverviewTable tr").click(function() {
+    $(".changesOverviewTr").click(function() {
 
       var containerWidth = $('.di-container').width();
       var containerHeight = $('.di-container').height();
