@@ -9,48 +9,15 @@
       Diffing = require('bpmn-js-diffing');
 
 
-  function createViewer(container) {
-    return new BpmnViewer({ container: container, height: '100%', width: '100%' });
-  }
-
-
-  // we use $.ajax to load the diagram.
-  // make sure you run the application via web-server (ie. connect (node) or asdf (ruby))
-
-  function loadDiagram(diagram, viewer, done) {
-    if (diagram.xml) {
-      return viewer.importXML(diagram.xml, done);
-    }
-
-    $.get(diagram.url, function(xml) {
-      viewer.importXML(xml, done);
+  function createViewer(side) {
+    return new BpmnViewer({
+      container: '#canvas-' + side,
+      height: '100%',
+      width: '100%'
     });
   }
 
-
-  function loadDiagrams(diagramOld, diagramNew, done) {
-
-    var loading = 2;
-
-    var viewerOld = createViewer(diagramOld.container),
-        viewerNew = createViewer(diagramNew.container);
-
-    function doneLoading(err) {
-      if (err) {
-        return done(err);
-      }
-
-      if (--loading === 0) {
-        done(null, viewerOld, viewerNew);
-      }
-    }
-
-    loadDiagram(diagramOld, viewerOld, doneLoading);
-    loadDiagram(diagramNew, viewerNew, doneLoading);
-  }
-
-
-  function syncNavigation(viewerOld, viewerNew) {
+  function syncViewers(a, b) {
 
     var changing;
 
@@ -68,13 +35,108 @@
     }
 
     function syncViewbox(a, b) {
-      a.get('eventBus').on('canvas.viewbox.changed', update(b));
+      a.on('canvas.viewbox.changed', update(b));
     }
 
+    syncViewbox(a, b);
+    syncViewbox(b, a);
+  }
 
-    syncViewbox(viewerOld, viewerNew);
-    syncViewbox(viewerNew, viewerOld);
+  function createViewers(left, right) {
 
+    var sides = {};
+
+    sides[left] = createViewer(left);
+    sides[right] = createViewer(right);
+
+    // sync navigation
+    syncViewers(sides[left], sides[right]);
+
+    return sides;
+  }
+
+
+  var viewers = createViewers('left', 'right');
+
+  function getViewer(side) {
+    return viewers[side];
+  }
+
+
+  function allDiagramsLoaded() {
+    return _.every(viewers, function(v) {
+      return !v.loading;
+    });
+  }
+
+  function setLoading(viewer, loading) {
+    viewer.loading = loading;
+  }
+
+
+  function clearDiffs(viewer) {
+    viewer.get('overlays').remove({ type: 'diff' });
+
+    // TODO(nre): expose as external API
+    _.forEach(viewer.get('elementRegistry')._elementMap, function(container) {
+      var gfx = container.gfx;
+
+      gfx
+        .removeClass('diff-added')
+        .removeClass('diff-changed')
+        .removeClass('diff-removed')
+        .removeClass('diff-layout-changed');
+    });
+
+  }
+
+  function diagramLoading(side, viewer) {
+
+    setLoading(viewer, true);
+
+    var loaded = _.filter(viewers, function(v, s) {
+      return s !== side && v.loading !== undefined && !v.loading;
+    });
+
+    // clear diffs on loaded
+    _.forEach(loaded, function(v) {
+      clearDiffs(v);
+    });
+  }
+
+  function diagramLoaded(err, side, viewer) {
+    if (err) {
+      console.error('load error', err);
+    }
+
+    setLoading(viewer, err);
+
+    if (allDiagramsLoaded()) {
+      showDiff(getViewer('left'), getViewer('right'));
+    }
+  }
+
+
+  // we use $.ajax to load the diagram.
+  // make sure you run the application via web-server (ie. connect (node) or asdf (ruby))
+
+  function loadDiagram(side, diagram) {
+
+    var viewer = getViewer(side);
+
+    function done(err) {
+      diagramLoaded(err, side, viewer);
+    }
+
+    diagramLoading(side, viewer);
+
+    if (diagram.xml) {
+      return viewer.importXML(diagram.xml, done);
+    }
+
+    $.get(diagram.url, function(xml) {
+      viewer.importXML(xml, done);
+    });
   }
 
 
@@ -84,7 +146,7 @@
 
 
     $.each(result._removed, function(i, obj) {
-      viewerOld.get('elementRegistry').getGraphicsByElement(obj).addClass('elementRemoved');
+      viewerOld.get('elementRegistry').getGraphicsByElement(obj).addClass('diff-removed');
 
       var overlays = viewerOld.get('overlays');
       addMarker (overlays, i, "marker-removed", "&minus;");
@@ -93,7 +155,7 @@
 
 
     $.each(result._added, function(i, obj) {
-      viewerNew.get('elementRegistry').getGraphicsByElement(obj).addClass('elementAdded');
+      viewerNew.get('elementRegistry').getGraphicsByElement(obj).addClass('diff-added');
 
       var overlays = viewerNew.get('overlays');
       addMarker (overlays, i, "marker-added", "&#43;");
@@ -103,24 +165,24 @@
 
     $.each(result._layoutChanged, function(i, obj) {
       console.log (i);
-      viewerOld.get('elementRegistry').getGraphicsByElement(i).addClass('elementMoved');
+      viewerOld.get('elementRegistry').getGraphicsByElement(i).addClass('diff-layout-changed');
       var overlays = viewerOld.get('overlays');
-      addMarker (overlays, i, "marker-layoutChanged", "&#8680;");
+      addMarker (overlays, i, "marker-layout-changed", "&#8680;");
 
-      viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('elementMoved');
+      viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('diff-layout-changed');
       var overlays = viewerNew.get('overlays');
-      addMarker (overlays, i, "marker-layoutChanged", "&#8680;");
+      addMarker (overlays, i, "marker-layout-changed", "&#8680;");
 
     });
 
 
     $.each(result._changed, function(i, obj) {
-      viewerOld.get('elementRegistry').getGraphicsByElement(i).addClass('elementEdited');
+      viewerOld.get('elementRegistry').getGraphicsByElement(i).addClass('diff-changed');
 
       var overlays = viewerOld.get('overlays');
       addMarker (overlays, i, "marker-changed", "&#9998;");
 
-      viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('elementEdited');
+      viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('diff-changed');
       var overlays = viewerNew.get('overlays');
       addMarker (overlays, i, "marker-changed", "&#9998;");
 
@@ -140,7 +202,7 @@
       var overlays = viewerOld.get('overlays');
 
       // attach an overlay to a node
-      overlays.add(i, {
+      overlays.add(i, 'diff', {
         position: {
           bottom: -5,
           left: 0
@@ -154,14 +216,14 @@
          $('#changeDetailsNew_' + i).toggle();
       });
 
-      viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('elementEdited');
+      viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('diff-changed');
 
       var detailsNew = '<div id="changeDetailsNew_' + i + '" class="changeDetails">' + details;
 
       var overlays = viewerNew.get('overlays');
 
       // attach an overlay to a node
-      overlays.add(i, {
+      overlays.add(i, 'diff', {
         position: {
           bottom: -5,
           left: 0
@@ -178,56 +240,13 @@
   }
 
 
-  var diagramOld = { url: '../resources/pizza-collaboration/old.bpmn', container: '#canvas_old' },
-      diagramNew = { url: '../resources/pizza-collaboration/new.bpmn', container: '#canvas_new' };
+  loadDiagram('left', { url: '../resources/pizza-collaboration/old.bpmn' });
+  loadDiagram('right', { url: '../resources/pizza-collaboration/new.bpmn' });
 
 
-  loadDiagrams(diagramOld, diagramNew, function(err, viewerOld, viewerNew) {
-
-    if (err) {
-      return console.log('something went wrong when opening the diagrams', err);
-    }
-
-    // sync viewer navigation
-    syncNavigation(viewerOld, viewerNew);
-
-    // show diff
-    showDiff(viewerOld, viewerNew);
-  });
-
-
-
-  var viewerOld, viewerNew;
-
-
-  function openDiagram(xml, target) {
-    var viewer;
-
-    $( '#' + target ).empty();
-
-    viewer = createViewer('#' + target);
-
-    loadDiagram({ xml: xml }, viewer, function(err) {
-      if (err) {
-        console.error('something went wrong:', err);
-      }
-    });
-
-    if (target == 'canvas_old') {
-      viewerOld = viewer;
-    } else if (target == 'canvas_new') {
-      viewerNew = viewer;
-    }
+  function openDiagram(xml, side) {
+    loadDiagram(side, { xml: xml });
   }
-
-  $('.file').on('change', function(e) {
-    openFile(e.target.files[0], $(this).attr('target'), openDiagram);
-  });
-
-  $('#diffNow').on('click', function(e) {
-    showDiff(viewerOld, viewerNew);
-  });
-
 
   function openFile(file, target, done) {
     var reader = new FileReader();
@@ -240,15 +259,19 @@
     reader.readAsText(file);
   }
 
+  $('.file').on('change', function(e) {
+    openFile(e.target.files[0], $(this).attr('target'), openDiagram);
+  });
 
-  function addMarker (overlays, elementId, className, symbol) {
+
+  function addMarker(overlays, elementId, className, symbol) {
 
     try {
       // attach an overlay to a node
-      overlays.add(elementId, {
+      overlays.add(elementId, 'diff', {
         position: {
-          top: -15,
-          right: 20
+          top: -12,
+          right: 12
         },
         html: '<span class="marker ' + className + '">' + symbol + '</span>'
       });

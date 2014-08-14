@@ -1,15 +1,50 @@
-.elementRemoved .djs-visual > *:nth-child(1) {
-  stroke: red !important;
+.diff-removed:not(.djs-connection) .djs-visual > :nth-child(1) {
+  fill: #deb1b1 !important;
 }
 
-.elementAdded .djs-visual > *:nth-child(1) {
-  stroke: green !important;
+.diff-removed.djs-connection .djs-visual > :nth-child(1) {
+  stroke: #de4343 !important;
 }
 
-.elementMoved .djs-visual > *:nth-child(1) {
-  stroke: blue !important;
+.marker.marker-removed {
+  background: #de4343;
 }
 
-.elementEdited .djs-visual > *:nth-child(1) {
-  stroke: orange !important;
+
+.diff-added:not(.djs-connection) .djs-visual > :nth-child(1) {
+  fill: #bad9ad !important;
+}
+
+.diff-added.djs-connection .djs-visual > :nth-child(1) {
+  stroke: #5dd82d !important;
+}
+
+.marker.marker-added {
+  background: #5dd82d;
+}
+
+
+.diff-layout-changed:not(.djs-connection) .djs-visual > :nth-child(1) {
+  fill: #abc4d6 !important;
+}
+
+.diff-layout-changed.djs-connection .djs-visual > :nth-child(1) {
+  stroke: #3b92d6 !important;
+}
+
+.marker.marker-layout-changed {
+  background: #3b92d6;
+}
+
+
+.diff-changed:not(.djs-connection) .djs-visual > :nth-child(1) {
+  fill: #e8d9ba !important;
+}
+
+.diff-changed.djs-connection .djs-visual > :nth-child(1) {
+  stroke: #e8ad3b !important;
+}
+
+.marker.marker-changed {
+  background: #e8ad3b;
 }
