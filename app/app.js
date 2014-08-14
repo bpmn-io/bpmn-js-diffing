@@ -164,7 +164,7 @@
 
 
     $.each(result._layoutChanged, function(i, obj) {
-      console.log (i);
+
       viewerOld.get('elementRegistry').getGraphicsByElement(i).addClass('diff-layout-changed');
       var overlays = viewerOld.get('overlays');
       addMarker (overlays, i, "marker-layout-changed", "&#8680;");
@@ -280,6 +280,22 @@
     }
   }
 
+  function addPointer(overlays, elementId, className) {
+
+    try {
+      // attach an overlay to a node
+      overlays.add(elementId, 'diff', {
+        position: {
+          top: -20,
+          right: 12
+        },
+        html: '<span class="changePointer ' + className + '">&#9754;</span>'
+      });
+    } catch (e) {
+      // fuck you, haha
+    }
+  }
+
   $('#changesOverviewToggle').on('click', function(e) {
     showChangesOverview();
 
@@ -323,29 +339,45 @@
         var elementId =  $(this).attr("elementId");
         var changed = $(this).attr("changed");
 
-        console.log ("Element ID ist: " + elementId);
-
         if (changed == "removed") {
-          viewerOld.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+          // viewerOld.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+
+          var overlays = viewerOld.get('overlays');
+          addPointer (overlays, elementId);
+
         } else if (changed == "added") {
-          viewerNew.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+          // viewerNew.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+          var overlays = viewerNew.get('overlays');
+          addPointer (overlays, elementId);
+
         } else {
-          viewerOld.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
-          viewerNew.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+          // viewerOld.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+          // viewerNew.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+
+          var overlays = viewerOld.get('overlays');
+          addPointer (overlays, elementId);
+
+          overlays = viewerNew.get('overlays');
+          addPointer (overlays, elementId);
+
         }
       }, function() {
-        var elementId =  $(this).attr("elementId");
-        var changed = $(this).attr("changed");
 
-        if (changed == "removed") {
-          viewerOld.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
-        } else if (changed == "added") {
-          viewerNew.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
-        } else {
-          viewerOld.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
-          viewerNew.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
-        }
+        $('.changePointer').remove();
 
+        /*
+          var elementId =  $(this).attr("elementId");
+          var changed = $(this).attr("changed");
+
+          if (changed == "removed") {
+            viewerOld.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
+          } else if (changed == "added") {
+            viewerNew.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
+          } else {
+            viewerOld.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
+            viewerNew.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
+          }
+        */
       }
     );
 

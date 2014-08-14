@@ -143,3 +143,17 @@
 .elementSelected .djs-visual > *:nth-child(1) {
   stroke-width: 5 !important;
 }
+
+.changePointer  {
+  font-size: 500%;
+  color: #000;
+  padding-top:2px;
+  padding-bottom: 2px;
+  padding-left:5px;
+  padding-right: 5px;
+
+}
+
+.changePointer-changed {
+
+}
