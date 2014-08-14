@@ -151,49 +151,40 @@
 
 
     $.each(result._removed, function(i, obj) {
-      viewerOld.get('elementRegistry').getGraphicsByElement(obj).addClass('diff-removed');
-
-      var overlays = viewerOld.get('overlays');
-      addMarker (overlays, i, "marker-removed", "&minus;");
-
+      highlight(viewerOld, i, 'diff-removed');
+      addMarker(viewerOld, i, 'marker-removed', '&minus;');
     });
 
 
     $.each(result._added, function(i, obj) {
-      viewerNew.get('elementRegistry').getGraphicsByElement(obj).addClass('diff-added');
-
-      var overlays = viewerNew.get('overlays');
-      addMarker (overlays, i, "marker-added", "&#43;");
-
+      highlight(viewerNew, i, 'diff-added');
+      addMarker(viewerNew, i, 'marker-added', '&#43;');
     });
 
 
     $.each(result._layoutChanged, function(i, obj) {
+      highlight(viewerOld, i, 'diff-layout-changed');
+      addMarker(viewerOld, i, 'marker-layout-changed', '&#8680;');
 
-      viewerOld.get('elementRegistry').getGraphicsByElement(i).addClass('diff-layout-changed');
-      var overlays = viewerOld.get('overlays');
-      addMarker (overlays, i, "marker-layout-changed", "&#8680;");
-
-      viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('diff-layout-changed');
-      var overlays = viewerNew.get('overlays');
-      addMarker (overlays, i, "marker-layout-changed", "&#8680;");
-
+      highlight(viewerNew, i, 'diff-layout-changed');
+      addMarker(viewerNew, i, 'marker-layout-changed', '&#8680;');
     });
 
 
     $.each(result._changed, function(i, obj) {
-      viewerOld.get('elementRegistry').getGraphicsByElement(i).addClass('diff-changed');
 
-      var overlays = viewerOld.get('overlays');
-      addMarker (overlays, i, "marker-changed", "&#9998;");
+      highlight(viewerOld, i, 'diff-changed');
+      addMarker(viewerOld, i, 'marker-changed', '&#9998;');
 
-      viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('diff-changed');
-      var overlays = viewerNew.get('overlays');
-      addMarker (overlays, i, "marker-changed", "&#9998;");
+      highlight(viewerNew, i, 'diff-changed');
+      addMarker(viewerNew, i, 'marker-changed', '&#9998;');
 
       var details = '<table ><tr><th>Attribute</th><th>old</th><th>new</th></tr>';
       $.each(obj.attrs, function(attr, changes) {
-        details = details + '<tr><td>' + attr + '</td><td>' + changes.oldValue + '</td><td>' + changes.newValue + '</td></tr>';
+        details = details + '<tr>' +
+          '<td>' + attr + '</td><td>' + changes.oldValue + '</td>' +
+          '<td>' + changes.newValue + '</td>' +
+        '</tr>';
       });
 
       details = details + '</table></div>';
@@ -204,10 +195,8 @@
 
       var detailsOld = '<div id="changeDetailsOld_' + i + '" class="changeDetails">' + details;
 
-      var overlays = viewerOld.get('overlays');
-
       // attach an overlay to a node
-      overlays.add(i, 'diff', {
+      viewerOld.get('overlays').add(i, 'diff', {
         position: {
           bottom: -5,
           left: 0
@@ -221,14 +210,10 @@
          $('#changeDetailsNew_' + i).toggle();
       });
 
-      viewerNew.get('elementRegistry').getGraphicsByElement(i).addClass('diff-changed');
-
       var detailsNew = '<div id="changeDetailsNew_' + i + '" class="changeDetails">' + details;
 
-      var overlays = viewerNew.get('overlays');
-
       // attach an overlay to a node
-      overlays.add(i, 'diff', {
+      viewerNew.get('overlays').add(i, 'diff', {
         position: {
           bottom: -5,
           left: 0
@@ -311,7 +296,9 @@
   });
 
 
-  function addMarker(overlays, elementId, className, symbol) {
+  function addMarker(viewer, elementId, className, symbol) {
+
+    var overlays = viewer.get('overlays');
 
     try {
       // attach an overlay to a node
@@ -327,170 +314,122 @@
     }
   }
 
-  function addPointer(overlays, elementId, className) {
-
-    try {
-      // attach an overlay to a node
-      overlays.add(elementId, 'diff', {
-        position: {
-          top: -20,
-          right: 12
-        },
-        html: '<span class="changePointer ' + className + '">&#9754;</span>'
-      });
-    } catch (e) {
-      // fuck you, haha
-    }
+  function highlight(viewer, elementId, marker) {
+    viewer.get('canvas').addMarker(elementId, marker);
   }
 
+  function unhighlight(viewer, elementId, marker) {
+    viewer.get('canvas').removeMarker(elementId, marker);
+  }
 
-  $("#changesOverviewContainer").hide();
-  $('#hideChangesOverview').hide();
-
-  $('#hideChangesOverview').click(function () {
-    $('#hideChangesOverview').hide();
-    $('#showChangesOverview').show();
-    $("#changesOverviewContainer").slideToggle("fast");
+  $('#changes-overview .show-hide-toggle').click(function () {
+    $('#changes-overview').toggleClass('collapsed');
   });
 
-  $('#showChangesOverview').click(function () {
-    $('#showChangesOverview').hide();
-    $("#changesOverviewContainer").slideToggle("fast", function() {
-        $('#hideChangesOverview').show();
-    });
-  });
 
   function showChangesOverview (result, viewerOld, viewerNew) {
 
-    $("#changesOverviewTable").remove();
+    $('#changes-overview table').remove();
 
-    var changesOverviewTable = "<table id='changesOverviewTable'><tr><th>#</th><th>Name</th><th>Type</th><th>Change</th></tr>";
-
-    console.log (result);
+    var changesTable = $(
+      '<table>' +
+        '<thead><tr><th>#</th><th>Name</th><th>Type</th><th>Change</th></tr></thead>' +
+      '</table>');
 
     var count = 0;
 
+    function addRow(element, type, label) {
+      var html =
+        '<tr class="entry">' +
+          '<td>' + (count++) + '</td><td>' + (element.name || '') + '</td>' +
+          '<td>' + element.$type.replace('bpmn:', '') + '</td>' +
+          '<td><span class="status">' + label + '</span></td>' +
+        '</tr>';
+
+      var row = $(html).data({
+        changed: type,
+        element: element.id
+      }).addClass(type).appendTo(changesTable);
+    }
+
     $.each(result._removed, function(i, obj) {
-      count++;
-      changesOverviewTable += "<tr class='changesOverviewTr' elementId='" + obj.id + "' changed='removed'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='removed'>Removed</td></tr>";
+      addRow(obj, 'removed', 'Removed');
     });
 
     $.each(result._added, function(i, obj) {
-      count++;
-      changesOverviewTable += "<tr class='changesOverviewTr' elementId='" + obj.id + "' changed='added'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='added'>Added</td></tr>";
+      addRow(obj, 'added', 'Added');
     });
 
     $.each(result._changed, function(i, obj) {
-      count++;
-      changesOverviewTable += "<tr class='changesOverviewTr' elementId='" + obj.model.id + "' changed='changed'><td>" + count + "</td><td>" + obj.model.name + "</td><td>" + obj.model.$type.replace('bpmn:', '') + "</td><td class='changed'>Changed</td></tr>";
+      addRow(obj.model, 'changed', 'Changed');
     });
 
     $.each(result._layoutChanged, function(i, obj) {
-      count++;
-      changesOverviewTable += "<tr class='changesOverviewTr' elementId='" + obj.id + "' changed='layoutChanged'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='layoutChanged'>Layout</td></tr>";
+      addRow(obj, 'layout-changed', 'Layout Changed');
     });
 
-    changesOverviewTable += "</table>";
+    changesTable.appendTo('#changes-overview .changes');
 
 
+    var HIGHLIGHT_CLS = 'highlight';
 
-    $('#changesOverviewContainer').append (changesOverviewTable);
+    $('#changes-overview tr.entry').each(function() {
 
-    $(".changesOverviewTr").hover(
-      function() {
-        var elementId =  $(this).attr("elementId");
-        var changed = $(this).attr("changed");
+      var row = $(this);
 
-        if (changed == "removed") {
-          // viewerOld.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+      var id = row.data('element');
+      var changed = row.data('changed');
 
-          var overlays = viewerOld.get('overlays');
-          addPointer (overlays, elementId);
+      row.hover(function() {
 
-        } else if (changed == "added") {
-          // viewerNew.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
-          var overlays = viewerNew.get('overlays');
-          addPointer (overlays, elementId);
-
+        if (changed == 'removed') {
+          highlight(viewerOld, id, HIGHLIGHT_CLS);
+        } else if (changed == 'added') {
+          highlight(viewerNew, id, HIGHLIGHT_CLS);
         } else {
-          // viewerOld.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
-          // viewerNew.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
-
-          var overlays = viewerOld.get('overlays');
-          addPointer (overlays, elementId);
-
-          overlays = viewerNew.get('overlays');
-          addPointer (overlays, elementId);
-
+          highlight(viewerOld, id, HIGHLIGHT_CLS);
+          highlight(viewerNew, id, HIGHLIGHT_CLS);
         }
       }, function() {
 
-        $('.changePointer').remove();
-
-        /*
-          var elementId =  $(this).attr("elementId");
-          var changed = $(this).attr("changed");
-
-          if (changed == "removed") {
-            viewerOld.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
-          } else if (changed == "added") {
-            viewerNew.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
-          } else {
-            viewerOld.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
-            viewerNew.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
-          }
-        */
-      }
-    );
-
-    $(".changesOverviewTr").click(function() {
-
-      var containerWidth = $('.di-container').width();
-      var containerHeight = $('.di-container').height();
-
-      var elementId =  $(this).attr("elementId");
-      var changed = $(this).attr("changed");
-
-      if (changed == "removed") {
-
-        if (viewerOld.get('elementRegistry').getById(elementId).waypoints) {
-          var x = viewerOld.get('elementRegistry').getById(elementId).waypoints[0].x;
-          var y = viewerOld.get('elementRegistry').getById(elementId).waypoints[0].y;
-
+        if (changed == 'removed') {
+          unhighlight(viewerOld, id, HIGHLIGHT_CLS);
+        } else if (changed == 'added') {
+          unhighlight(viewerNew, id, HIGHLIGHT_CLS);
         } else {
-          var x = viewerOld.get('elementRegistry').getById(elementId).x;
-          var y = viewerOld.get('elementRegistry').getById(elementId).y;
+          unhighlight(viewerOld, id, HIGHLIGHT_CLS);
+          unhighlight(viewerNew, id, HIGHLIGHT_CLS);
+        }
+      });
+
+      row.click(function() {
+
+        var containerWidth = $('.di-container').width();
+        var containerHeight = $('.di-container').height();
+
+        var viewer = (changed == 'removed' ? viewerOld : viewerNew);
+
+        var element = viewer.get('elementRegistry').getById(id);
+
+        var x, y;
+
+        if (element.waypoints) {
+          x = element.waypoints[0].x;
+          y = element.waypoints[0].y;
+        } else {
+          x = element.x + element.width / 2;
+          y = element.y + element.height / 2;
         }
 
-        var newCanvas = viewerOld.get('canvas');
-        newCanvas.viewbox({ x: x - (containerWidth/2), y: y - ((containerHeight/2) - 100), width: containerWidth, height: 800 });
-
-      } else {
-
-        if (viewerNew.get('elementRegistry').getById(elementId).waypoints) {
-          var x = viewerNew.get('elementRegistry').getById(elementId).waypoints[0].x;
-          var y = viewerNew.get('elementRegistry').getById(elementId).waypoints[0].y;
-
-        } else {
-
-          var x = viewerNew.get('elementRegistry').getById(elementId).x;
-          var y = viewerNew.get('elementRegistry').getById(elementId).y;
-        }
-
-        var newCanvas = viewerNew.get('canvas');
-        newCanvas.viewbox({ x: x - (containerWidth/2), y: y - ((containerHeight/2) - 100), width: containerWidth, height: 800 });
-      }
-
-
-
+        viewer.get('canvas').viewbox({
+          x: x - (containerWidth / 2),
+          y: y - ((containerHeight / 2) - 100),
+          width: containerWidth,
+          height: containerHeight
+        });
+      });
 
     });
-
-
-
-
-
-
   }
 
 })();

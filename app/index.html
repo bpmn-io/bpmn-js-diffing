@@ -21,7 +21,7 @@
   <div class="content">
 
     <div class="di-container left drop-zone" target="left">
-      <div class="di-header">
+      <div class="io-control di-header">
         <h2>version A</h2>
         <input class="file" type="file" target="left">
       </div>
@@ -30,7 +30,7 @@
     </div>
 
     <div class="di-container right drop-zone" target="right">
-      <div class="di-header">
+      <div class="io-control di-header">
         <h2>version B</h2>
         <input class="file" type="file" target="right">
       </div>
@@ -38,9 +38,9 @@
       <div class="canvas" id="canvas-right"></div>
     </div>
 
-    <div id="hideChangesOverview"><h2>Hide Changes Overview</h2></div>
-    <div id="showChangesOverview"><h2>Show Changes Overview</h2></div>
-    <div id="changesOverviewContainer">
+    <div id="changes-overview" class="collapsed">
+      <div class="io-control show-hide-toggle">Toggle List Changes</div>
+      <div class="io-control changes"></div>
     </div>
 
   </div>
