@@ -62,11 +62,12 @@
     return viewers[side];
   }
 
+  function isLoaded(v) {
+    return v.loading !== undefined && !v.loading;
+  }
 
   function allDiagramsLoaded() {
-    return _.every(viewers, function(v) {
-      return !v.loading;
-    });
+    return _.every(viewers, isLoaded);
   }
 
   function setLoading(viewer, loading) {
@@ -90,13 +91,12 @@
 
   }
 
+
   function diagramLoading(side, viewer) {
 
     setLoading(viewer, true);
 
-    var loaded = _.filter(viewers, function(v, s) {
-      return s !== side && v.loading !== undefined && !v.loading;
-    });
+    var loaded = _.filter(viewers, isLoaded);
 
     // clear diffs on loaded
     _.forEach(loaded, function(v) {
@@ -112,6 +112,11 @@
     setLoading(viewer, err);
 
     if (allDiagramsLoaded()) {
+
+      // sync viewboxes
+      var other = getViewer(side == 'left' ? 'right' : 'left');
+      viewer.get('canvas').viewbox(other.get('canvas').viewbox());
+
       showDiff(getViewer('left'), getViewer('right'));
     }
   }
@@ -311,11 +316,10 @@
     $("#changesOverviewContainer").slideToggle("fast", function() {
         $('#hideChangesOverview').show();
     });
-  });  
+  });
 
-  
   function showChangesOverview (result, viewerOld, viewerNew) {
-    
+
     $("#changesOverviewTable").remove();
 
     var changesOverviewTable = "<table id='changesOverviewTable'><tr><th>#</th><th>Name</th><th>Type</th><th>Change</th></tr>";
@@ -347,7 +351,7 @@
     changesOverviewTable += "</table>";
 
 
-  
+
     $('#changesOverviewContainer').append (changesOverviewTable);
 
     $(".changesOverviewTr").hover(
@@ -418,7 +422,7 @@
 
         var newCanvas = viewerOld.get('canvas');
         newCanvas.viewbox({ x: x - (containerWidth/2), y: y - ((containerHeight/2) - 100), width: containerWidth, height: 800 });
-      
+
       } else {
 
         if (viewerNew.get('elementRegistry').getById(elementId).waypoints) {
@@ -442,7 +446,7 @@
 
 
 
-    
+
 
 
   }
