@@ -97,12 +97,12 @@
 #changesOverviewContainer {
   position: absolute;
   left: 25%;
-  top: 80%;
+  bottom: 0;
   width: 50%;
   height: 40%;
   background: rgba(54, 50, 50, .8);
   text-align: center;
-  overflow: scroll;
+  overflow: auto;
   color: #fff;
 
   z-index: 110;
