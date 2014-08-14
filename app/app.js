@@ -82,8 +82,6 @@
 
     var result = Diffing.diff (viewerOld.definitions, viewerNew.definitions);
 
-    console.log (result);
-
 
     $.each(result._removed, function(i, obj) {
       viewerOld.get('elementRegistry').getGraphicsByElement(obj).addClass('elementRemoved');
@@ -173,6 +171,10 @@
 
       $('#changeDetailsNew_' + i).toggle();
     });
+
+    // create Table Overview of Changes
+    showChangesOverview (result, viewerOld, viewerNew);
+
   }
 
 
@@ -253,6 +255,98 @@
     } catch (e) {
       // fuck you, haha
     }
+  }
+
+  $('#changesOverviewToggle').on('click', function(e) {
+    showChangesOverview();
+
+  });
+  
+  function showChangesOverview (result, viewerOld, viewerNew) {
+    var changesOverviewTable = "<table id='changesOverviewTable'><tr><th>#</th><th>Name</th><th>Type</th><th>Change</th></tr>";
+
+    console.log (result);
+
+    var count = 0;
+
+    $.each(result._removed, function(i, obj) {
+      count++;
+      changesOverviewTable += "<tr elementId='" + obj.id + "' changed='removed'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='removed'>Removed</td></tr>";
+    });
+
+    $.each(result._added, function(i, obj) {
+      count++;
+      changesOverviewTable += "<tr elementId='" + obj.id + "' changed='added'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='added'>Added</td></tr>";
+    });
+
+    $.each(result._changed, function(i, obj) {
+      count++;
+      changesOverviewTable += "<tr elementId='" + obj.model.id + "' changed='changed'><td>" + count + "</td><td>" + obj.model.name + "</td><td>" + obj.model.$type.replace('bpmn:', '') + "</td><td class='changed'>Changed</td></tr>";
+    });
+
+    $.each(result._layoutChanged, function(i, obj) {
+      count++;
+      changesOverviewTable += "<tr elementId='" + obj.id + "' changed='layoutChanged'><td>" + count + "</td><td>" + obj.name + "</td><td>" + obj.$type.replace('bpmn:', '') + "</td><td class='layoutChanged'>Layout</td></tr>";
+    });
+
+    changesOverviewTable += "</table>";
+
+
+  
+    $('#changesOverviewContainer').append (changesOverviewTable);
+
+    $("#changesOverviewTable tr").hover(
+      function() {
+        var elementId =  $(this).attr("elementId");
+        var changed = $(this).attr("changed");
+
+        if (changed == "removed") {
+          viewerOld.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+        } else if (changed == "added") {
+          viewerNew.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+        } else {
+          viewerOld.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+          viewerNew.get('elementRegistry').getGraphicsByElement(elementId).addClass('elementSelected');
+        }
+      }, function() {
+        var elementId =  $(this).attr("elementId");
+        var changed = $(this).attr("changed");
+
+        if (changed == "removed") {
+          viewerOld.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
+        } else if (changed == "added") {
+          viewerNew.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
+        } else {
+          viewerOld.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
+          viewerNew.get('elementRegistry').getGraphicsByElement(elementId).removeClass('elementSelected');
+        }
+
+      }
+    );
+
+    $("#changesOverviewTable tr").click(function() {
+
+      var elementId =  $(this).attr("elementId");
+      var changed = $(this).attr("changed");
+
+      if (changed == "removed") {
+        var x = viewerOld.get('elementRegistry').getById(elementId).x;
+        var y = viewerOld.get('elementRegistry').getById(elementId).y;
+
+        
+      }
+
+      var newCanvas = viewerNew.get('canvas');
+      newCanvas.viewbox({ x: 200, y: 0, width: 800, height: 800 });
+
+
+    });
+
+
+
+    
+
+
   }
 
 })();

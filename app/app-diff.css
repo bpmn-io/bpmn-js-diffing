@@ -67,3 +67,51 @@ html, body, .canvas {
 	padding-left:4px;
 	padding-right: 4px;
 }
+
+#changesOverviewContainer {
+	position: absolute;
+	left: 25%;
+	top: 80%;
+	width: 50%;
+	height: 40%;
+	background: rgba(54, 50, 50, .8);
+	text-align: center;
+	overflow: scroll;
+	color: #fff;
+}
+
+#changesOverviewTable {
+	margin: 30px;
+	width:80%;
+	text-align: left;
+}
+
+#changesOverviewTable tr:hover {
+	background-color: #000;
+	cursor: pointer;
+}
+
+#changesOverviewTable td.removed {
+	background-color: red;
+	font-weight: bold;
+	width:40px;
+}
+
+#changesOverviewTable td.added {
+	background-color: green;
+	font-weight: bold;
+}
+
+#changesOverviewTable td.changed {
+	background-color: orange;
+	font-weight: bold;
+}
+
+#changesOverviewTable td.layoutChanged {
+	background-color: blue;
+	font-weight: bold;
+}
+
+.elementSelected .djs-visual > *:nth-child(1) {
+  stroke-width: 5 !important;
+}
