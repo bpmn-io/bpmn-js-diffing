@@ -264,6 +264,48 @@
     reader.readAsText(file);
   }
 
+
+  $('.drop-zone').each(function() {
+    var node = this,
+        element = $(node);
+
+    element.append('<div class="drop-marker" />');
+
+    function removeMarker() {
+      $('.drop-zone').removeClass('dropping');
+    }
+
+    function handleFileSelect(e) {
+      e.stopPropagation();
+      e.preventDefault();
+
+      var files = e.dataTransfer.files;
+      openFile(files[0], element.attr('target'), openDiagram);
+
+      removeMarker();
+    }
+
+    function handleDragOver(e) {
+      removeMarker();
+
+      e.stopPropagation();
+      e.preventDefault();
+
+      element.addClass('dropping');
+
+      e.dataTransfer.dropEffect = 'copy';
+    }
+
+    function handleDragLeave(e) {
+      removeMarker();
+    }
+
+    node.addEventListener('dragover', handleDragOver, false);
+    node.ownerDocument.body.addEventListener('dragover', handleDragLeave, false);
+
+    node.addEventListener('drop', handleFileSelect, false);
+  });
+
   $('.file').on('change', function(e) {
     openFile(e.target.files[0], $(this).attr('target'), openDiagram);
   });

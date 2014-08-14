@@ -57,6 +57,34 @@
   overflow: hidden;
 }
 
+
+/**
+ * drag and drop
+ */
+
+.drop-marker {
+  border: dashed 5px #CCC;
+  border-radius: 20px;
+
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  right: 20px;
+  bottom: 20px;
+}
+
+.di-container .drop-marker,
+.di-container.dropping :not(.drop-marker) {
+  display: none;
+}
+
+.dropping .drop-marker {
+  display: block;
+}
+
+/**
+ * change overlays / tables
+ */
 .changeDetails table {
   border: 2px solid orange;
   width: 300px;
