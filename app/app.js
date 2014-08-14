@@ -417,7 +417,7 @@
         }
 
         var newCanvas = viewerOld.get('canvas');
-        newCanvas.viewbox({ x: x - (containerWidth/2), y: y - (containerHeight/2) + 100, width: containerWidth, height: 800 });
+        newCanvas.viewbox({ x: x - (containerWidth/2), y: y - ((containerHeight/2) - 100), width: containerWidth, height: 800 });
       
       } else {
 
@@ -432,7 +432,7 @@
         }
 
         var newCanvas = viewerNew.get('canvas');
-        newCanvas.viewbox({ x: x - (containerWidth/2), y: y - (containerHeight/2), width: containerWidth, height: 800 });
+        newCanvas.viewbox({ x: x - (containerWidth/2), y: y - ((containerHeight/2) - 100), width: containerWidth, height: 800 });
       }
 
 
