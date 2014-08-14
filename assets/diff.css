@@ -1,50 +1,50 @@
 .diff-removed:not(.djs-connection) .djs-visual > :nth-child(1) {
-  fill: #deb1b1 !important;
+  fill: #E56283 /* light-red */ !important;
 }
 
 .diff-removed.djs-connection .djs-visual > :nth-child(1) {
-  stroke: #de4343 !important;
+  stroke: #BB163F /* red */ !important;
 }
 
 .marker.marker-removed {
-  background: #de4343;
+  background: #BB163F /* red */;
 }
 
 
 .diff-added:not(.djs-connection) .djs-visual > :nth-child(1) {
-  fill: #bad9ad !important;
+  fill: #90DD5F /* light-green */!important;
 }
 
 .diff-added.djs-connection .djs-visual > :nth-child(1) {
-  stroke: #5dd82d !important;
+  stroke: #54B415 /* green */ !important;
 }
 
 .marker.marker-added {
-  background: #5dd82d;
+  background: #54B415 /* green */;
 }
 
 
 .diff-layout-changed:not(.djs-connection) .djs-visual > :nth-child(1) {
-  fill: #abc4d6 !important;
+  fill: #4D79A3 /* light-blue */ !important;
 }
 
 .diff-layout-changed.djs-connection .djs-visual > :nth-child(1) {
-  stroke: #3b92d6 !important;
+  stroke: #185085 /* blue */ !important;
 }
 
 .marker.marker-layout-changed {
-  background: #3b92d6;
+  background: #185085 /* blue */;
 }
 
 
 .diff-changed:not(.djs-connection) .djs-visual > :nth-child(1) {
-  fill: #e8d9ba !important;
+  fill: #FBC16C /* light-yellow */ !important;
 }
 
 .diff-changed.djs-connection .djs-visual > :nth-child(1) {
-  stroke: #e8ad3b !important;
+  stroke: #CD8318 /* yellow */ !important;
 }
 
 .marker.marker-changed {
-  background: #e8ad3b;
+  background: #CD8318 /* yellow */;
 }
