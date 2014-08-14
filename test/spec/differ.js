@@ -223,6 +223,30 @@ describe('diffing', function() {
   describe('scenarios', function() {
 
 
+    it('should diff collaboration pools / lanes', function(done) {
+
+      var aDiagram = fs.readFileSync('test/fixtures/collaboration/before.bpmn', 'utf-8');
+      var bDiagram = fs.readFileSync('test/fixtures/collaboration/after.bpmn', 'utf-8');
+
+
+      // when
+      diff(aDiagram, bDiagram, function(err, results, aDefinitions, bDefinitions) {
+
+        if (err) {
+          return done(err);
+        }
+
+        // then
+        expect(results._added).to.have.keys([ 'Participant_2' ]);
+        expect(results._removed).to.have.keys([ 'Participant_1', 'Lane_1' ]);
+        expect(results._layoutChanged).to.have.keys([ '_Participant_2', 'Lane_2' ]);
+        expect(results._changed).to.have.keys([ 'Lane_2' ]);
+
+        done();
+      });
+    });
+
+
     it('should diff pizza collaboration StartEvent move', function(done) {
 
       var aDiagram = fs.readFileSync('resources/pizza-collaboration/start-event-old.bpmn', 'utf-8');
