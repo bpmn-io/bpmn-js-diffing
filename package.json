@@ -51,7 +51,7 @@
     "bpmn-moddle": "^0.3.0",
     "bpmn-js": "^0.4.1",
     "jquery": "^2.1.0",
-    "lodash": "^2.4.0",
+    "lodash": "^4.17.15",
     "grunt-jsdoc": "^0.5.6"
   }
 }
