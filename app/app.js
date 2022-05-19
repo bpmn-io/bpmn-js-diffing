@@ -310,7 +310,8 @@
         html: '<span class="marker ' + className + '">' + symbol + '</span>'
       });
     } catch (e) {
-      // fuck you, haha
+      
+      // ignore error
     }
   }
 
